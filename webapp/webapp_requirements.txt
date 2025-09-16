@@ -1,0 +1,16 @@
+# Flask Web App Requirements
+# Install with: pip install -r webapp_requirements.txt
+
+Flask==2.3.3
+Werkzeug==2.3.7
+Pillow==10.0.1
+
+# Core ML requirements (if not already installed)
+torch>=1.0.1
+torchvision
+opencv-python-headless
+numpy
+pyyaml
+tqdm
+albumentations>=1.0.0
+scikit-image==0.18.1

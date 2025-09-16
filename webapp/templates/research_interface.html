@@ -1,0 +1,128 @@
+                <div class="analysis-item"><div class="label">Blur Variance (After)</div><div class="value improvement">${after.blur_level.variance}</div></div>
+                <div class="analysis-item"><div class="label">Edge Density (Before)</div><div class="value">${before.edge_density.density_percent}%</div></div>
+                <div class="analysis-item"><div class="label">Edge Density (After)</div><div class="value improvement">${after.edge_density.density_percent}%</div></div>
+                <div class="analysis-item"><div class="label">Frequency Balance</div><div class="value">${before.frequency_analysis.frequency_balance}</div></div>
+            `;
+        }
+        
+        function populatePerformanceMetrics(analysis) {
+            const perf = analysis.performance;
+            document.getElementById('performanceMetrics').innerHTML = `
+                <div class="analysis-item"><div class="label">Total Processing Time</div><div class="value">${perf.processing_time_s}s</div></div>
+                <div class="analysis-item"><div class="label">Inference Time</div><div class="value">${perf.inference_time_ms}ms</div></div>
+                <div class="analysis-item"><div class="label">Memory Used</div><div class="value">${perf.memory_used_mb} MB</div></div>
+                <div class="analysis-item"><div class="label">CPU Usage</div><div class="value">${perf.cpu_usage_percent}%</div></div>
+                <div class="analysis-item"><div class="label">Processing Device</div><div class="value">${analysis.model_info.device}</div></div>
+                <div class="analysis-item"><div class="label">Peak Memory</div><div class="value">${perf.peak_memory_gb} GB</div></div>
+            `;
+        }
+        
+        function populateQualityImprovements(analysis) {
+            const improvements = analysis.improvements;
+            document.getElementById('qualityImprovements').innerHTML = `
+                <div class="analysis-item"><div class="label">Sharpness Improvement</div><div class="value improvement">+${improvements.sharpness_improvement_percent}%</div></div>
+                <div class="analysis-item"><div class="label">Edge Enhancement</div><div class="value improvement">+${improvements.edge_improvement_percent}%</div></div>
+                <div class="analysis-item"><div class="label">Before Sharpness Score</div><div class="value">${improvements.before_sharpness}</div></div>
+                <div class="analysis-item"><div class="label">After Sharpness Score</div><div class="value improvement">${improvements.after_sharpness}</div></div>
+                <div class="analysis-item"><div class="label">Before Edge Density</div><div class="value">${improvements.before_edge_density}%</div></div>
+                <div class="analysis-item"><div class="label">After Edge Density</div><div class="value improvement">${improvements.after_edge_density}%</div></div>
+            `;
+        }
+        
+        function showBatchResults(data) {
+            const stats = data.batch_stats;
+            document.getElementById('batchStats').innerHTML = `
+                <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;"><div style="font-size: 2rem; font-weight: 700; color: #28a745;">${stats.total_files}</div><div style="font-size: 0.9rem; color: #6c757d;">Total Images</div></div>
+                <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;"><div style="font-size: 2rem; font-weight: 700; color: #28a745;">${stats.successful}</div><div style="font-size: 0.9rem; color: #6c757d;">Successful</div></div>
+                <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;"><div style="font-size: 2rem; font-weight: 700; color: #28a745;">${stats.avg_processing_time}s</div><div style="font-size: 0.9rem; color: #6c757d;">Avg Time</div></div>
+                <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;"><div style="font-size: 2rem; font-weight: 700; color: #28a745;">${stats.avg_improvement}%</div><div style="font-size: 0.9rem; color: #6c757d;">Avg Improvement</div></div>
+            `;
+            
+            let detailedHTML = '<table style="width: 100%; border-collapse: collapse;"><tr style="background: #667eea; color: white;"><th style="padding: 10px;">Filename</th><th style="padding: 10px;">Time</th><th style="padding: 10px;">Improvement</th><th style="padding: 10px;">Status</th></tr>';
+            data.results.forEach(result => {
+                detailedHTML += `<tr><td style="padding: 10px;">${result.filename}</td><td style="padding: 10px;">${result.processing_time}s</td><td style="padding: 10px; color: #28a745;">+${result.improvement}%</td><td style="padding: 10px; color: #28a745;">✅ Success</td></tr>`;
+            });
+            detailedHTML += '</table>';
+            document.getElementById('batchDetailedResults').innerHTML = detailedHTML;
+        }
+        
+        function loadModelInfo() {
+            fetch('/api/model_info')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('modelSpecs').innerHTML = `
+                        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;"><div style="opacity: 0.8;">Architecture</div><div style="font-weight: 600;">${data.architecture}</div></div>
+                        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;"><div style="opacity: 0.8;">Backbone</div><div style="font-weight: 600;">${data.backbone}</div></div>
+                        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;"><div style="opacity: 0.8;">Parameters</div><div style="font-weight: 600;">${data.parameters_millions}</div></div>
+                        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;"><div style="opacity: 0.8;">Model Size</div><div style="font-weight: 600;">${data.model_size_mb}</div></div>
+                        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;"><div style="opacity: 0.8;">Device</div><div style="font-weight: 600;">${data.device}</div></div>
+                    `;
+                    if(document.getElementById('processingDevice')) document.getElementById('processingDevice').textContent = data.device;
+                })
+                .catch(error => console.error('Model info failed:', error));
+        }
+        
+        function loadSystemInfo() {
+            fetch('/api/system_info')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('systemInfo').innerHTML = `
+                        <div class="analysis-item"><div class="label">CPU Cores</div><div class="value">${data.cpu_count}</div></div>
+                        <div class="analysis-item"><div class="label">Total Memory</div><div class="value">${data.memory_total_gb} GB</div></div>
+                        <div class="analysis-item"><div class="label">Python Version</div><div class="value">${data.python_version}</div></div>
+                        <div class="analysis-item"><div class="label">OpenCV Version</div><div class="value">${data.opencv_version}</div></div>
+                    `;
+                })
+                .catch(error => console.error('System info failed:', error));
+        }
+        
+        function loadStats() {
+            fetch('/api/stats')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('overallStats').innerHTML = `
+                        <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 15px; padding: 25px; text-align: center;"><div style="font-size: 2.5rem; font-weight: 700; color: #667eea;">${data.total_images}</div><div style="font-size: 0.9rem; color: #6c757d;">IMAGES PROCESSED</div></div>
+                        <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 15px; padding: 25px; text-align: center;"><div style="font-size: 2.5rem; font-weight: 700; color: #667eea;">${data.avg_processing_time_s}s</div><div style="font-size: 0.9rem; color: #6c757d;">AVG TIME</div></div>
+                        <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 15px; padding: 25px; text-align: center;"><div style="font-size: 2.5rem; font-weight: 700; color: #667eea;">${data.avg_sharpness_improvement}%</div><div style="font-size: 0.9rem; color: #6c757d;">AVG IMPROVEMENT</div></div>
+                        <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 15px; padding: 25px; text-align: center;"><div style="font-size: 2.5rem; font-weight: 700; color: #667eea;">${data.throughput_per_hour}</div><div style="font-size: 0.9rem; color: #6c757d;">IMAGES/HOUR</div></div>
+                    `;
+                    
+                    document.getElementById('processingStats').innerHTML = `
+                        <div class="analysis-item"><div class="label">Total Processed</div><div class="value">${data.total_images}</div></div>
+                        <div class="analysis-item"><div class="label">Success Rate</div><div class="value improvement">${data.success_rate}%</div></div>
+                        <div class="analysis-item"><div class="label">Min Time</div><div class="value">${data.min_processing_time_s}s</div></div>
+                        <div class="analysis-item"><div class="label">Max Time</div><div class="value">${data.max_processing_time_s}s</div></div>
+                        <div class="analysis-item"><div class="label">Avg Memory</div><div class="value">${data.avg_memory_usage_mb} MB</div></div>
+                        <div class="analysis-item"><div class="label">Throughput</div><div class="value">${data.throughput_per_hour} img/hr</div></div>
+                    `;
+                })
+                .catch(error => console.error('Stats failed:', error));
+        }
+        
+        function startSessionTimer() {
+            setInterval(() => {
+                const uptime = Date.now() - sessionStartTime;
+                const hours = Math.floor(uptime / 3600000);
+                const minutes = Math.floor((uptime % 3600000) / 60000);
+                const seconds = Math.floor((uptime % 60000) / 1000);
+                if(document.getElementById('sessionUptime')) {
+                    document.getElementById('sessionUptime').textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+        
+        function resetAnalysis() {
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+            currentAnalysis = null;
+            loadStats();
+        }
+        
+        // Auto-refresh
+        setInterval(() => {
+            if (document.getElementById('stats-tab').classList.contains('active')) loadStats();
+            if (document.getElementById('model-tab').classList.contains('active')) loadSystemInfo();
+        }, 30000);
+    </script>
+</body>
+</html>
