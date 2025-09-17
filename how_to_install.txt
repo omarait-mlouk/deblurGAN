@@ -1,0 +1,71 @@
+## 🚀 **Quick Start**
+
+### **Method 1: Automatic Startup (Recommended)**
+
+#### On Mac/Linux:
+```bash
+cd webapp
+chmod +x start_webapp.sh
+./start_webapp.sh
+```
+
+#### On Windows:
+```cmd
+cd webapp
+start_webapp.bat
+```
+
+### **Method 2: Manual Setup**
+
+```bash
+# 1. Navigate to webapp directory
+cd webapp
+
+# 2. Install Flask requirements
+pip install -r webapp_requirements.txt
+
+# 3. Start the web server
+python app.py
+```
+
+### **Method 3: From Your Virtual Environment**
+
+```bash
+# 1. Activate your environment
+source myenv/bin/activate  # or conda activate myenv
+
+# 2. Navigate and start
+cd webapp
+pip install flask pillow
+python app.py
+```
+
+## 🌐 **Using the Web App**
+
+### **1. Start the Server**
+Run one of the startup methods above. You'll see:
+```
+🚀 Initializing DeblurGAN-v2 model...
+✅ Model loaded successfully!
+🌐 Starting Flask web server...
+📱 Access the app at: http://localhost:5000
+```
+
+### **2. Open Your Browser**
+Navigate to: **http://localhost:5000**
+
+### **3. Upload an Image**
+- **Drag & Drop**: Drag any image onto the upload area
+- **Click to Browse**: Click "Choose Image" button
+- **Supported Formats**: JPG, PNG, BMP, TIFF (max 16MB)
+
+### **4. Watch the Magic Happen**
+- ⏳ **Loading Screen**: AI processing indicator with spinner
+- 🧠 **Real-time Status**: "AI is processing your image..."
+- ⚡ **Processing Time**: Usually 10-30 seconds depending on CPU/GPU
+
+### **5. View Results**
+- ✨ **Deblurred Image**: Your enhanced result
+- 📊 **Before/After Comparison**: Side-by-side view
+- 📥 **Download Button**: Get your processed image
+- 🔄 **Process Another**: Upload more images
